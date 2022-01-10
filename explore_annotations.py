@@ -7,6 +7,11 @@ from stqdm import stqdm
 from src.constants.colors import COLOR_MAP
 from src.utils.display import load_and_annotate_image, load_crop
 
+st.set_page_config(
+    "Explore coco dataset val set",
+    page_icon=":mag_right:",
+)
+
 
 @st.experimental_memo
 def load_all_annotations():
