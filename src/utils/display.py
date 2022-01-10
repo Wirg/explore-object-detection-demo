@@ -4,12 +4,16 @@ from typing import Dict, Optional, Tuple
 import numpy as np
 import pandas as pd
 import requests
+import streamlit as st
 from PIL import Image
 
 from src.types import Array, Color, PIL_Image
 from src.utils.draw_bbox import draw_bboxes
 
+HOUR = 60 * 60
 
+
+@st.experimental_memo(ttl=1 * HOUR)
 def open_image(url: str) -> PIL_Image:
     response = requests.get(url)
     return Image.open(BytesIO(response.content))
@@ -28,6 +32,7 @@ def resize_with_pad(
     return result
 
 
+@st.experimental_memo(ttl=5 * HOUR)
 def load_crop(
     url: str,
     x1y1x2y2: Tuple[int, int, int, int],
@@ -40,6 +45,7 @@ def load_crop(
     return np.array(crop)
 
 
+@st.experimental_memo(ttl=5 * HOUR)
 def load_and_annotate_image(
     url: str, image_annotations: pd.Series, color_map: Dict[str, Color]
 ) -> Array:
