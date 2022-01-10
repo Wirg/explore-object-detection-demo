@@ -1,3 +1,5 @@
+from typing import List
+
 import pandas as pd
 import streamlit as st
 from stqdm import stqdm
@@ -11,6 +13,21 @@ def load_all_annotations():
     return pd.read_csv("data/annotations/coco_val_2020.csv")
 
 
+def get_arguments_from_query(
+    key_name: str, available_values: List[str], default_values: List[str]
+) -> List[str]:
+    query_params = st.experimental_get_query_params()
+    if query_params and key_name in query_params:
+        default_values = query_params[key_name]
+        non_existing_values = set(default_values) - set(available_values)
+        if non_existing_values:
+            st.error(
+                f"The following {key_name}s in your query don't exist in the dataset {non_existing_values}"
+            )
+            st.stop()
+    return default_values
+
+
 annotations = load_all_annotations()
 
 with st.sidebar:
@@ -22,8 +39,11 @@ with st.sidebar:
         )
         annotations = annotations.loc[lambda df: df.image_name.isin(images_to_display)]
     else:
+        available_labels = annotations.category_name.unique()
         labels_to_display = st.multiselect(
-            "Labels to display", annotations.category_name.unique()
+            "Labels to display",
+            available_labels,
+            get_arguments_from_query("label", available_labels, default_values=[]),
         )
         if display_crops:
             annotations = annotations.loc[
@@ -44,7 +64,9 @@ with st.sidebar:
 
 
 if display_crops:
-    for _, crop_annotations in stqdm(annotations.iterrows(), desc="Displaying Images"):
+    for _, crop_annotations in stqdm(
+        annotations.iterrows(), desc="Displaying Images", total=len(annotations)
+    ):
         image_name = crop_annotations["image_name"]
         coco_url = crop_annotations["coco_url"]
         coordinates = crop_annotations[["x1", "y1", "x2", "y2"]]
