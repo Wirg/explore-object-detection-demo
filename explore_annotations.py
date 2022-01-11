@@ -10,7 +10,7 @@ from src.utils.display import HOUR, load_and_annotate_image, load_crop
 Subset = Literal["train", "val"]
 
 st.set_page_config(
-    "Explore coco dataset val set",
+    "Explore coco dataset",
     page_icon=":mag_right:",
 )
 
