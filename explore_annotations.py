@@ -37,11 +37,11 @@ def cached_isin(series: pd.Series, elements: List[str]) -> pd.Series:
 
 @st.experimental_memo(ttl=3 * HOUR)
 def get_selected_annotations(
-    subset: Subset, selected_images: Optional[List[str]], selected_categories: List[str]
+    subset: Subset, selected_images: List[str], selected_categories: List[str]
 ) -> pd.DataFrame:
     all_annotations = load_all_annotations(subset)
 
-    if selected_images is None:
+    if not selected_images:
         selected_annotations_for_image = True
     else:
         selected_annotations_for_image = cached_isin(
@@ -93,8 +93,6 @@ with st.sidebar:
         available_image_names,
         get_arguments_from_query("image_name", available_image_names, default_values=[]),
     )
-    if not images_to_display:
-        images_to_display = None
     labels_to_display = st.multiselect(
         "Labels to display",
         available_labels,
