@@ -164,6 +164,8 @@ st.experimental_set_query_params(
 
 if annotations.empty:
     st.title("Sorry your request does not have any annotations ! :/")
+    st.image("http://images.cocodataset.org/val2017/000000066841.jpg")
+    st.stop()
 
 if display_crops:
     n_annotations = len(annotations)
