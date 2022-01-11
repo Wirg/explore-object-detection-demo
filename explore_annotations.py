@@ -163,7 +163,7 @@ st.experimental_set_query_params(
 )
 
 if annotations.empty:
-    st.title("Sorry you requests does not have any annotations ! :/")
+    st.title("Sorry your request does not have any annotations ! :/")
 
 if display_crops:
     n_annotations = len(annotations)
