@@ -16,7 +16,7 @@ HOUR = 60 * 60
 @st.experimental_memo(ttl=1 * HOUR)
 def open_image(url: str) -> PIL_Image:
     response = requests.get(url)
-    return Image.open(BytesIO(response.content))
+    return Image.open(BytesIO(response.content)).convert("RGB")
 
 
 def resize_with_pad(
