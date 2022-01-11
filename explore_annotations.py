@@ -82,16 +82,18 @@ def get_arguments_from_query(
 
 
 with st.sidebar:
-    subset = st.selectbox("Subset", ["val", "train"])
-    category_count = get_category_count(subset)
-    st.write(get_category_count(subset))
+    selected_subset = st.selectbox("Subset", ["val", "train"])
+    category_count = get_category_count(selected_subset)
+    st.write(get_category_count(selected_subset))
     display_crops = st.checkbox("Display Crops")
     available_labels = category_count.index.tolist()
-    available_image_names = get_available_image_names(subset)
+    available_image_names = get_available_image_names(selected_subset)
     images_to_display = st.multiselect(
         "Images to display [Empty = All]",
         available_image_names,
-        get_arguments_from_query("image_name", available_image_names, default_values=[]),
+        get_arguments_from_query(
+            "image_name", available_image_names, default_values=[]
+        ),
     )
     labels_to_display = st.multiselect(
         "Labels to display",
@@ -103,10 +105,12 @@ with st.sidebar:
     )
     if display_only_selected_labels:
         annotations = get_selected_annotations(
-            subset, images_to_display, labels_to_display
+            selected_subset, images_to_display, labels_to_display
         )
     else:
-        annotations = get_selected_images(subset, images_to_display, labels_to_display)
+        annotations = get_selected_images(
+            selected_subset, images_to_display, labels_to_display
+        )
 
 if display_crops:
     for _, crop_annotations in stqdm(
