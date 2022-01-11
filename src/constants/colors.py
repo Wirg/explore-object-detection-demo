@@ -8,6 +8,7 @@ COLOR_MAP: Dict[str, Color] = {
     "backpack": (0, 0, 128),
     "banana": (0, 0, 139),
     "baseball glove": (0, 0, 255),
+    "baseball bat": (0, 0, 255),
     "bear": (0, 100, 0),
     "bed": (0, 128, 0),
     "bench": (0, 139, 139),
