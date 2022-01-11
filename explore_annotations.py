@@ -5,7 +5,7 @@ import streamlit as st
 from stqdm import stqdm
 
 from src.constants.colors import COLOR_MAP
-from src.utils.display import HOUR, load_and_annotate_image, load_crop
+from src.utils.display import HOUR, load_and_annotate_image, load_crop, open_image
 
 Subset = Literal["train", "val"]
 
@@ -164,7 +164,8 @@ st.experimental_set_query_params(
 
 if annotations.empty:
     st.title("Sorry your request does not have any annotations ! :/")
-    st.image("http://images.cocodataset.org/val2017/000000066841.jpg")
+    # Cache coco toaster image to avoid spamming the repository
+    st.image(open_image("http://images.cocodataset.org/val2017/000000066841.jpg"))
     st.stop()
 
 if display_crops:
