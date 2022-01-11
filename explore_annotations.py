@@ -90,13 +90,18 @@ def get_single_argument_from_query(
 ) -> ParamType:
     query_params = st.experimental_get_query_params()
     if query_params and key_name in query_params:
-        value = query_params[key_name][0]
-        if value not in available_values:
+        param_value = query_params[key_name][0]
+        try:
+            return next(
+                real_value
+                for real_value in available_values
+                if str(real_value) == param_value
+            )
+        except StopIteration:
             st.error(
-                f"The following {key_name} in your query is not valid {value}. Authorized ({available_values})"
+                f"The following {key_name} in your query is not valid {param_value}. Authorized : {available_values}"
             )
             st.stop()
-        return value
     return available_values[default]
 
 
@@ -111,7 +116,12 @@ with st.sidebar:
     category_count = get_category_count(selected_subset)
     st.write(category_count)
     st.write(f"{len(category_count)} Labels available")
-    display_crops = st.checkbox("Display Crops")
+    display_crops = st.checkbox(
+        "Display Crops",
+        value=get_single_argument_from_query(
+            "display_crops", available_values=[False, True]
+        ),
+    )
     available_labels = category_count.index.tolist()
     available_image_names = get_available_image_names(selected_subset)
     images_to_display = st.multiselect(
@@ -127,7 +137,10 @@ with st.sidebar:
         get_arguments_list_from_query("label", available_labels, default_values=[]),
     )
     display_only_selected_labels = st.checkbox(
-        "Display only selected labels", value=False
+        "Display only selected labels",
+        value=get_single_argument_from_query(
+            "display_only_selected_labels", available_values=[False, True]
+        ),
     )
     if display_only_selected_labels:
         annotations = get_selected_annotations(
@@ -137,6 +150,14 @@ with st.sidebar:
         annotations = get_selected_images(
             selected_subset, images_to_display, labels_to_display
         )
+
+st.experimental_set_query_params(
+    subset=selected_subset,
+    display_only_selected_labels=display_only_selected_labels,
+    display_crops=display_crops,
+    image_name=images_to_display,
+    label=labels_to_display,
+)
 
 if display_crops:
     n_annotations = len(annotations)
