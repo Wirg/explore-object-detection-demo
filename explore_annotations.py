@@ -162,6 +162,9 @@ st.experimental_set_query_params(
     label=labels_to_display,
 )
 
+if annotations.empty:
+    st.title("Sorry you requests does not have any annotations ! :/")
+
 if display_crops:
     n_annotations = len(annotations)
     with st.sidebar:
