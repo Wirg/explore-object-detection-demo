@@ -130,14 +130,14 @@ with st.sidebar:
             "image_name", available_image_names, default_values=[]
         ),
     )
-    if st.button("Empty selection"):
+    if st.button("Empty selection", key="empty_images"):
         images_to_display = []
     labels_to_display = st.multiselect(
         "Labels to display",
         available_labels,
         get_arguments_list_from_query("label", available_labels, default_values=[]),
     )
-    if st.button("Empty selection"):
+    if st.button("Empty selection", key="empty_labels"):
         labels_to_display = []
     display_only_selected_labels = st.checkbox(
         "Display only selected labels",
