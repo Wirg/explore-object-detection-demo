@@ -84,7 +84,8 @@ def get_arguments_from_query(
 with st.sidebar:
     selected_subset = st.selectbox("Subset", ["val", "train"])
     category_count = get_category_count(selected_subset)
-    st.write(get_category_count(selected_subset))
+    st.write(category_count)
+    st.write(f"{len(category_count)} Labels available")
     display_crops = st.checkbox("Display Crops")
     available_labels = category_count.index.tolist()
     available_image_names = get_available_image_names(selected_subset)
@@ -113,18 +114,24 @@ with st.sidebar:
         )
 
 if display_crops:
+    n_annotations = len(annotations)
+    with st.sidebar:
+        st.write(f"{n_annotations} crops selected")
     for _, crop_annotations in stqdm(
-        annotations.iterrows(), desc="Displaying Images", total=len(annotations)
+        annotations.iterrows(), desc="Displaying Images", total=n_annotations
     ):
         image_name = crop_annotations["image_name"]
         coco_url = crop_annotations["coco_url"]
         coordinates = crop_annotations[["x1", "y1", "x2", "y2"]]
         st.image(load_crop(coco_url, coordinates, shape=(640, 480)), caption=image_name)
 else:
+    n_images = len(annotations[["image_name", "coco_url"]].drop_duplicates())
+    with st.sidebar:
+        st.write(f"{n_images} images selected")
     for (image_name, coco_url), image_annotations in stqdm(
         annotations.groupby(["image_name", "coco_url"]),
         desc="Displaying Images",
-        total=len(annotations[["image_name", "coco_url"]].drop_duplicates()),
+        total=n_images,
     ):
         st.image(
             load_and_annotate_image(coco_url, image_annotations, color_map=COLOR_MAP),
