@@ -25,6 +25,11 @@ def get_category_count(subset: Subset) -> pd.DataFrame:
     return load_all_annotations(subset).category_name.value_counts()
 
 
+@st.experimental_memo()
+def get_available_image_names(subset: Subset) -> List[str]:
+    return load_all_annotations(subset).image_name.drop_duplicates().tolist()
+
+
 @st.experimental_memo(ttl=6 * HOUR)
 def cached_isin(series: pd.Series, elements: List[str]) -> pd.Series:
     return series.isin(elements)
@@ -82,9 +87,11 @@ with st.sidebar:
     st.write(get_category_count(subset))
     display_crops = st.checkbox("Display Crops")
     available_labels = category_count.index.tolist()
+    available_image_names = get_available_image_names(subset)
     images_to_display = st.multiselect(
         "Images to display [Empty = All]",
-        available_labels,
+        available_image_names,
+        get_arguments_from_query("image_name", available_image_names, default_values=[]),
     )
     if not images_to_display:
         images_to_display = None
