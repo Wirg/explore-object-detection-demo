@@ -1,4 +1,4 @@
-from typing import List, Literal, Optional
+from typing import List, Literal, Optional, TypeVar
 
 import pandas as pd
 import streamlit as st
@@ -66,23 +66,48 @@ def get_selected_images(
     return all_annotations.loc[cached_isin(all_annotations.image_name, selected_images)]
 
 
-def get_arguments_from_query(
+def get_arguments_list_from_query(
     key_name: str, available_values: List[str], default_values: List[str]
 ) -> List[str]:
     query_params = st.experimental_get_query_params()
     if query_params and key_name in query_params:
-        default_values = query_params[key_name]
-        non_existing_values = set(default_values) - set(available_values)
+        values = query_params[key_name]
+        non_existing_values = set(values) - set(available_values)
         if non_existing_values:
             st.error(
                 f"The following {key_name}s in your query don't exist in the dataset {non_existing_values}"
             )
             st.stop()
+        return values
     return default_values
 
 
+ParamType = TypeVar("ParamType")
+
+
+def get_single_argument_from_query(
+    key_name: str, available_values: List[ParamType], default: int = 0
+) -> ParamType:
+    query_params = st.experimental_get_query_params()
+    if query_params and key_name in query_params:
+        value = query_params[key_name][0]
+        if value not in available_values:
+            st.error(
+                f"The following {key_name} in your query is not valid {value}. Authorized ({available_values})"
+            )
+            st.stop()
+        return value
+    return available_values[default]
+
+
 with st.sidebar:
-    selected_subset = st.selectbox("Subset", ["val", "train"])
+    selected_subset = st.selectbox(
+        "Subset",
+        ["val", "train"],
+        ["val", "train"].index(
+            get_single_argument_from_query("subset", ["val", "train"])
+        ),
+    )
     category_count = get_category_count(selected_subset)
     st.write(category_count)
     st.write(f"{len(category_count)} Labels available")
@@ -92,14 +117,14 @@ with st.sidebar:
     images_to_display = st.multiselect(
         "Images to display [Empty = All]",
         available_image_names,
-        get_arguments_from_query(
+        get_arguments_list_from_query(
             "image_name", available_image_names, default_values=[]
         ),
     )
     labels_to_display = st.multiselect(
         "Labels to display",
         available_labels,
-        get_arguments_from_query("label", available_labels, default_values=[]),
+        get_arguments_list_from_query("label", available_labels, default_values=[]),
     )
     display_only_selected_labels = st.checkbox(
         "Display only selected labels", value=False
