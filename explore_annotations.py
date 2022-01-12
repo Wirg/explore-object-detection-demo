@@ -115,12 +115,7 @@ with st.sidebar:
     category_count = get_category_count(selected_subset)
     st.write(category_count)
     st.write(f"{len(category_count)} Labels available")
-    display_crops = st.checkbox(
-        "Display Crops",
-        value=get_single_argument_from_query(
-            "display_crops", available_values=[False, True]
-        ),
-    )
+
     available_labels = category_count.index.tolist()
     available_image_names = get_available_image_names(selected_subset)
     images_to_display = st.multiselect(
@@ -143,6 +138,12 @@ with st.sidebar:
         "Display only selected labels",
         value=get_single_argument_from_query(
             "display_only_selected_labels", available_values=[False, True]
+        ),
+    )
+    display_crops = st.checkbox(
+        "Display Crops",
+        value=get_single_argument_from_query(
+            "display_crops", available_values=[False, True]
         ),
     )
     if display_only_selected_labels:
