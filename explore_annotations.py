@@ -177,9 +177,13 @@ if display_crops:
         annotations.iterrows(), desc="Displaying Images", total=n_annotations
     ):
         image_name = crop_annotations["image_name"]
+        category_name = crop_annotations["category_name"]
         coco_url = crop_annotations["coco_url"]
         coordinates = crop_annotations[["x1", "y1", "x2", "y2"]]
-        st.image(load_crop(coco_url, coordinates, shape=(640, 480)), caption=image_name)
+        st.image(
+            load_crop(coco_url, coordinates, shape=(640, 480)),
+            caption=f"{image_name}:{category_name} ({'-'.join(coordinates.values.astype(str))})",
+        )
 else:
     n_images = len(annotations[["image_name", "coco_url"]].drop_duplicates())
     with st.sidebar:
