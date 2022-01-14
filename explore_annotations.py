@@ -106,6 +106,7 @@ def get_single_argument_from_query(
 
 
 with st.sidebar:
+    url_holder = st.container()
     selected_subset = st.selectbox(
         "Subset",
         ["val", "train"],
@@ -114,7 +115,7 @@ with st.sidebar:
         ),
     )
     category_count = get_category_count(selected_subset)
-    st.write(category_count)
+    st.dataframe(category_count, height=200)
     st.write(f"{len(category_count)} Labels available")
 
     available_labels = category_count.index.tolist()
@@ -156,7 +157,8 @@ with st.sidebar:
             selected_subset, images_to_display, labels_to_display
         )
 
-    st.write("Url for current request")
+with url_holder:
+    st.write("Share current request")
     st.code(
         st.secrets["base_url"]
         + urllib.parse.urlencode(
