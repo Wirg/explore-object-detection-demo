@@ -1,3 +1,4 @@
+import urllib.parse
 from typing import List, Literal, Optional, TypeVar
 
 import pandas as pd
@@ -155,13 +156,22 @@ with st.sidebar:
             selected_subset, images_to_display, labels_to_display
         )
 
-st.experimental_set_query_params(
-    subset=selected_subset,
-    display_only_selected_labels=display_only_selected_labels,
-    display_crops=display_crops,
-    image_name=images_to_display,
-    label=labels_to_display,
-)
+    st.write("Url for current request")
+    st.code(
+        st.secrets["base_url"]
+        + urllib.parse.urlencode(
+            {
+                "subset": selected_subset,
+                "display_only_selected_labels": display_only_selected_labels,
+                "display_crops": display_crops,
+                "image_name": images_to_display,
+                "label": labels_to_display,
+            },
+            doseq=True,
+        ),
+        language="md",
+    )
+
 
 if annotations.empty:
     st.title("Sorry your request does not have any annotations ! :/")
