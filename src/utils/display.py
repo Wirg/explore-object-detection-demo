@@ -13,7 +13,7 @@ from src.utils.draw_bbox import draw_bboxes
 HOUR = 60 * 60
 
 
-@st.experimental_memo(max_entries=200)
+@st.experimental_memo(max_entries=300, ttl=HOUR)
 def open_image(url: str) -> PIL_Image:
     response = requests.get(url)
     return Image.open(BytesIO(response.content)).convert("RGB")
@@ -32,7 +32,7 @@ def resize_with_pad(
     return result
 
 
-@st.experimental_memo(ttl=0.5 * HOUR)
+@st.experimental_memo(max_entries=100, ttl=0.1 * HOUR)
 def load_crop(
     url: str,
     x1y1x2y2: Tuple[int, int, int, int],
@@ -45,7 +45,7 @@ def load_crop(
     return np.array(crop)
 
 
-@st.experimental_memo(ttl=0.5 * HOUR)
+@st.experimental_memo(max_entries=100, ttl=0.1 * HOUR)
 def load_and_annotate_image(
     url: str, image_annotations: pd.Series, color_map: Dict[str, Color]
 ) -> Array:

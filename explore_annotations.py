@@ -30,12 +30,12 @@ def get_available_image_names(subset: Subset) -> List[str]:
     return load_all_annotations(subset).image_name.drop_duplicates().tolist()
 
 
-@st.experimental_memo(max_entries=10)
+@st.experimental_memo(max_entries=10, ttl=0.1 * HOUR)
 def cached_isin(series: pd.Series, elements: List[str]) -> pd.Series:
     return series.isin(elements)
 
 
-@st.experimental_memo(ttl=0.5 * HOUR)
+@st.experimental_memo(max_entries=20, ttl=0.25 * HOUR)
 def get_selected_annotations(
     subset: Subset, selected_images: List[str], selected_categories: List[str]
 ) -> pd.DataFrame:
@@ -55,7 +55,7 @@ def get_selected_annotations(
     ]
 
 
-@st.experimental_memo(ttl=0.5 * HOUR)
+@st.experimental_memo(max_entries=20, ttl=0.25 * HOUR)
 def get_selected_images(
     subset: Subset, selected_images: Optional[List[str]], selected_categories: List[str]
 ) -> pd.DataFrame:
