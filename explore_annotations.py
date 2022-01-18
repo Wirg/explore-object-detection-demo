@@ -66,6 +66,13 @@ def get_selected_images(
     return all_annotations.loc[cached_isin(all_annotations.image_name, selected_images)]
 
 
+def get_url(**url_params):
+    return st.secrets["base_url"] + urllib.parse.urlencode(
+        url_params,
+        doseq=True,
+    )
+
+
 def get_arguments_list_from_query(
     key_name: str, available_values: List[str], default_values: List[str]
 ) -> List[str]:
@@ -77,6 +84,14 @@ def get_arguments_list_from_query(
             st.error(
                 f"The following {key_name}s in your query don't exist in the dataset {non_existing_values}"
             )
+            better_url = get_url(
+                **{
+                    **st.experimental_get_query_params(),
+                    key_name: list(set(values) & set(available_values)),
+                }
+            )
+            st.markdown(f"Try with [this url]({better_url})")
+            st.code(better_url)
             st.stop()
         return values
     return default_values
@@ -160,16 +175,12 @@ with st.sidebar:
 with url_holder:
     st.write("Share current request")
     st.code(
-        st.secrets["base_url"]
-        + urllib.parse.urlencode(
-            {
-                "subset": selected_subset,
-                "display_only_selected_labels": display_only_selected_labels,
-                "display_crops": display_crops,
-                "image_name": images_to_display,
-                "label": labels_to_display,
-            },
-            doseq=True,
+        get_url(
+            subset=selected_subset,
+            display_only_selected_labels=display_only_selected_labels,
+            display_crops=display_crops,
+            image_name=images_to_display,
+            label=labels_to_display,
         ),
         language="md",
     )
