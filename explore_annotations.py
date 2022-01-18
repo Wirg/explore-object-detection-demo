@@ -73,6 +73,26 @@ def get_url(**url_params):
     )
 
 
+def offer_better_urls(**improved_url_params):
+    better_urls = {
+        "Without the problematic params": get_url(
+            **{
+                **st.experimental_get_query_params(),
+                **improved_url_params,
+            }
+        ),
+        "Without any parameters to roam free": get_url(),
+        "With the toaster example": get_url(label="toaster"),
+    }
+    for header, better_url in better_urls.items():
+
+        st.subheader(f"{header}:")
+        st.markdown(
+            f"Try with [this url]({better_url}) to remove them or paste the one below."
+        )
+        st.code(better_url)
+
+
 def get_arguments_list_from_query(
     key_name: str, available_values: List[str], default_values: List[str]
 ) -> List[str]:
@@ -81,20 +101,14 @@ def get_arguments_list_from_query(
         values = query_params[key_name]
         non_existing_values = set(values) - set(available_values)
         if non_existing_values:
-            st.error(
-                f"The following {key_name}s in your query don't exist in the dataset {non_existing_values}"
-            )
-            better_url = get_url(
-                **{
-                    **st.experimental_get_query_params(),
-                    key_name: list(set(values) & set(available_values)),
-                }
-            )
-            st.markdown(
-                f"Try with [this url]({better_url}) to remove them or paste the one below."
-            )
-            st.code(better_url)
-            st.stop()
+            with st._main:
+                st.error(
+                    f"You may have an issue with your request! The following {key_name}s in your query url don't exist in the dataset {non_existing_values}"
+                )
+                offer_better_urls(
+                    **{key_name: list(set(values) & set(available_values))}
+                )
+                st.stop()
         return values
     return default_values
 
@@ -115,10 +129,12 @@ def get_single_argument_from_query(
                 if str(real_value) == param_value
             )
         except StopIteration:
-            st.error(
-                f"The following {key_name} in your query is not valid {param_value}. Authorized : {available_values}"
-            )
-            st.stop()
+            with st._main:
+                st.error(
+                    f"You may have an issue with your request! The following {key_name} in your query is not valid {param_value}. Authorized : {available_values}"
+                )
+                offer_better_urls(**{key_name: str(available_values[0])})
+                st.stop()
     return available_values[default]
 
 
