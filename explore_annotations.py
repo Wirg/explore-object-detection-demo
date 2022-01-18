@@ -90,7 +90,9 @@ def get_arguments_list_from_query(
                     key_name: list(set(values) & set(available_values)),
                 }
             )
-            st.markdown(f"Try with [this url]({better_url})")
+            st.markdown(
+                f"Try with [this url]({better_url}) to remove them or paste the one below."
+            )
             st.code(better_url)
             st.stop()
         return values
